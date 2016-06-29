@@ -151,7 +151,7 @@ var setupSession = function(result, res){
 
 	var swapFacesCallback = function(index, paint, imUrl){
 		if(imUrl){
-			result.collection[index] = {'success': true, 'painting': paint, 'imUrl': imUrl};
+			result.collection[index] = {'success': true, 'painting': paint, 'imUrl': imUrl.substring(imUrl.indexOf('images'))};
 		}
 		else{
 			result.collection[index] = {'success': false, 'painting': paint};
