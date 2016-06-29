@@ -5,7 +5,7 @@ var router = express.Router();
 /* GET home page. */
 router.get('/', function(req, res, next) {
 	if(req.query.imUrl){
-		swapper.getFaceSwap(req.query.imUrl, res);
+		swapper.getFaceSwap(decodeURIComponent(req.query.imUrl), res);
 	}
 	else{
 		res.json({'success':false});
