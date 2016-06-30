@@ -196,7 +196,7 @@ var setupSession = function(result, res){
 var getFaces = function(imagePath, res){
 	// console.log('Extracting Faces for: ' + imagePath + '\n');
 	
-	var c = child.exec(singleFaceExtractor + '\"' + imagePath + '\"', function(error, stdout, stderr) {
+	var c = child.exec(singleFaceExtractor + '"' + imagePath + '"', function(error, stdout, stderr) {
 		if (error) {
 			database_errors.insert({'msg': 'faceExtractor.py failed', 'error': error, 'error_id': 'EXTRACT'}, function(err, doc){
 				if (err){
