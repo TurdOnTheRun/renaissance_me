@@ -1,41 +1,26 @@
 var express = require('express');
 var fs = require( 'fs' );
-var path = require('path');
 var child = require('child_process');
-var Shuffle = require('shuffle');
+var path = require('path');
 
 var router = express.Router();
-var singleFaceExtractor = 'python ' + path.join(__dirname, '../python', 'dlibSingleFaceExtractor.py ');
 var faceSwap = 'python ' + path.join(__dirname, '../python', 'faceSwap.py ');
 var faceInsert = 'python ' + path.join(__dirname, '../python', 'insertSwapedFaces.py ');
 
-var PATH_TO_PORTRAIT_FACES = path.join(__dirname, '..', '/faces/');
+var painting_datas = JSON.parse(fs.readFileSync('faceDatabase.json', 'utf8'));
+var painting_magnitudes = JSON.parse(fs.readFileSync('magnitudes.json', 'utf8'));
+
 var PATH_TO_SESSIONS = path.join(__dirname, '..', '/sessions/');
+var PATH_TO_PORTRAIT_FACES = path.join(__dirname, '..', '/faces/');
 var PATH_TO_OUTPUTS = path.join(__dirname, '..', '/public/images/');
 
-var painting_magnitudes = JSON.parse(fs.readFileSync('magnitudes.json', 'utf8'));
-var painting_datas = JSON.parse(fs.readFileSync('faceDatabase.json', 'utf8'));
-
-//webfile database
-var mongo = require('mongodb');
-var monk = require('monk');
-var db = monk('localhost:27017/renaissanceme');
-var database_sessions = db.get('sessions');
-var database_errors = db.get('errors');
-
-var insertFaces = function(session, painting, index, callback){
+var insertFaces = function(session, callback){
 
 	var callFaceInsert = function(paintingId, pathToOutput, pathsToSwappedHeads, callback){
 
 		var c = child.exec(faceInsert + paintingId + ' ' + pathToOutput + ' ' + pathsToSwappedHeads, function(error, stdout, stderr) {
 			if (error) {
-				database_errors.insert({'session_id': session.session_id, 'msg': 'insertFaces.py failed.', 'error': error, 'error_id': 'INSERT'}, function(err, doc){
-					if (err){
-						//___ERROR___
-						console.log('\n\nWARNING: ERROR MESSAGES ARE FAILING!\n\n' + JSON.stringify(err));
-					}
-				});
-		    	//___ERROR___
+				console.log('faceInsert error: ' + error);
 			}
 			if(stderr){
 				console.log('Insertfaces.py stderr: ' + stderr);
@@ -57,8 +42,9 @@ var insertFaces = function(session, painting, index, callback){
 		});
 	};
 
-	var outputPath = PATH_TO_OUTPUTS + session.session_id + '/' + painting + '.png';
-	var swappedHeadsFolder = PATH_TO_SESSIONS + session.session_id + '/swapped/' + painting + '/';
+	var painting = painting_magnitudes[session.magnitudes][session.collection[session.index]];
+	var outputPath = PATH_TO_OUTPUTS + session.sessionId + '/' + painting + '.png';
+	var swappedHeadsFolder = PATH_TO_SESSIONS + session.sessionId + '/swapped/' + painting + '/';
 	var heads = [];
 
 	for(var i=0; i < session.faces.length; i++){
@@ -67,26 +53,23 @@ var insertFaces = function(session, painting, index, callback){
 
 	callFaceInsert(painting, outputPath, heads.join(' '), function(code){
 		if(code){
-			return callback(index, painting, outputPath);
+			session.collection[session.index] = { painting: painting, imgUrl: outputPath.substring(outputPath.indexOf('images')) };
+			return callback({ success: true, session: session });
 		}
 		else{
-			return callback(index, painting, false);
+			session.index++;
+			return swapFaces(session, callback);
 		}
 	});
 };
 
-var swapFaces = function(session, painting, index, callback){
+var swapFaces = function(session, callback){
 
 	var callFaceSwap = function(pathToHead, pathToFace, headMirror, faceMirror, pathToOutput, callback){
 
 		var c = child.exec(faceSwap + pathToHead + ' ' + pathToFace + ' ' + pathToOutput + ' ' + headMirror + ' ' + faceMirror, function(error, stdout, stderr) {
 			if (error) {
-				database_errors.insert({'session_id': session.session_id, 'msg': 'faceSwap.py failed', 'error': error, 'error_id': 'SWAP'}, function(err, doc){
-					if (err){
-						//___ERROR___
-						console.log('\n\nWARNING: ERROR MESSAGES ARE FAILING!\n\n' + JSON.stringify(err));
-					}
-				});
+				console.log('faceSwap.py error: ' + error);
 			}
 			if(stderr){
 				console.log('faceSwap.py stderr: ' + stderr);
@@ -96,7 +79,7 @@ var swapFaces = function(session, painting, index, callback){
 			}
 		});
 	
-		c.on('exit', function (code){
+		c.on('exit', function(code){
 			if(code !== 0){
 				return callback(false);
 			}
@@ -106,21 +89,23 @@ var swapFaces = function(session, painting, index, callback){
 		});
 	};
 
-	var counter = 0;
-	var inputFolder = PATH_TO_SESSIONS + session.session_id + '/input/';
+	if(session.index >= session.collection.length || typeof(session.collection[session.index]) === 'object'){
+		return callback({ success: false, session: session });
+	}
+	
+	var painting = painting_magnitudes[session.magnitudes][session.collection[session.index]];
+	console.log(painting_magnitudes[session.magnitudes]);
+	console.log(session.collection[session.index]);
+	var inputFolder = PATH_TO_SESSIONS + session.sessionId + '/input/';
 	var facesFolder = PATH_TO_PORTRAIT_FACES + painting + '/';
-	var outputFolder = PATH_TO_SESSIONS + session.session_id + '/swapped/' + painting + '/';
+	var outputFolder = PATH_TO_SESSIONS + session.sessionId + '/swapped/' + painting + '/';
+	var counter = 0;
 	var failure = false;
+
 	fs.mkdir(outputFolder, function(err){
 		if(err){
-			database_errors.insert({'session_id': session.session_id, 'msg': 'Mkdir failed.', 'error': err, 'error_id': 'MKDIR'}, function(err, doc){
-				if (err){
-					//___ERROR___
-					// throw err;
-					console.log('\n\nWARNING: ERROR MESSAGES ARE FAILING!\n\n' + JSON.stringify(err));
-				}
-			});
-			return callback(index, painting, false);
+			console.log('mkdir err: ' + err);
+			return callback({ success: false, session: session });
 		}
 		else{
 			session.faces.forEach(function(face, i){
@@ -132,10 +117,11 @@ var swapFaces = function(session, painting, index, callback){
 					}
 					if(counter === session.faces.length){
 						if(!failure){
-							return insertFaces(session, painting, index, callback);
+							return insertFaces(session, callback);
 						}
 						else{
-							return callback(index, painting, false);
+							session.index++;
+							return swapFaces(session, callback);
 						}
 					}
 				});
@@ -144,95 +130,6 @@ var swapFaces = function(session, painting, index, callback){
 	});
 };
 
-//Needs to be implemented
-var setupSession = function(result, res){
-	// result = {success, magnitudes, session_id, face_count, faces}	
-	// console.log(result.magnitudes);
-
-	var swapFacesCallback = function(index, paint, imUrl){
-		if(imUrl){
-			result.collection[index] = {'success': true, 'painting': paint, 'imUrl': imUrl.substring(imUrl.indexOf('images'))};
-		}
-		else{
-			result.collection[index] = {'success': false, 'painting': paint};
-		}
-		finished_paintings += 1;
-		if(finished_paintings == expected_paintings){
-			database_sessions.insert(result, function(err, doc){
-				if (err){
-					//___ERROR___
-					console.log('\n\nWARNING: SESSIONS DATABASE IS FAILING!\n\n' + JSON.stringify(err));
-				}
-			});
-			return res.json(result);
-		}
-	};
-
-	var paintings = painting_magnitudes[result.magnitudes];
-
-	if(!paintings){
-		return res.json({'success':false, 'msg':'NO_PAINTINGS_W_MAG', 'mag': result.magnitudes, 'error': 2});
-	}
-
-	var deck = Array.apply(null, {length: paintings.length}).map(Number.call, Number);
-	deck = Shuffle.shuffle({deck: deck});
-	result.collection = deck.cards;
-	result.collection_index = 0;
-	result.done = false;
-
-	var finished_paintings = 0;
-	var expected_paintings = 5;
-
-	for(var i=0; i < 5 && i < paintings.length; i++){
-		if(i == paintings.length - 1){
-			result.done = true;
-			expected_paintings = paintings.length;
-		}
-		var painting = paintings[result.collection[i]];
-		swapFaces(result, painting, i, swapFacesCallback);
-	}
-};
-
-var getFaces = function(imagePath, res){
-	// console.log('Extracting Faces for: ' + imagePath + '\n');
-	
-	var c = child.exec(singleFaceExtractor + '"' + imagePath + '"', function(error, stdout, stderr) {
-		if (error) {
-			database_errors.insert({'msg': 'faceExtractor.py failed', 'error': error, 'error_id': 'EXTRACT'}, function(err, doc){
-				if (err){
-					//___ERROR___
-					console.log('\n\nWARNING: ERROR MESSAGES ARE FAILING!\n\n' + JSON.stringify(err));
-				}
-			});
-	    	//___ERROR___
-		}
-		if(stderr){
-			console.log('faceExtractor.py stderr: ' + stderr);
-		}
-		if(stdout){
-			var result = JSON.parse(stdout);
-			if(result.success){
-				// console.log(JSON.stringify(result));
-				return setupSession(result, res);
-			}
-			else{
-				// console.log(result.msg);
-				return res.json(result);
-			}
-		}
-	});
-
-	c.on('exit', function (code){
-		if(code === 1){
-			// return res.json({'success': false, 'msg': 'ERROR_FACE_EXTRACTOR', 'error': 0});
-		}
-	});
-};
-
-router.getFaceSwap = getFaces;
+router.faceSwap = swapFaces;
 module.exports = router;
 
-// ERRORS:
-// 0: Wrong piping or error in execution
-// 1: No Faces in input
-// 2: No paintings match magnitudes

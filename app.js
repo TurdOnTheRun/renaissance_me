@@ -1,45 +1,48 @@
 var express = require('express');
 var path = require('path');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-
-var routes = require('./routes/index');
+var http = require('http');
+var setupSession = require('./routes/setupSession');
+var swapper = require('./routes/swapper');
 
 var app = express();
-
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.listen((process.env.PORT || 3000));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
+var SECRET = 'VYD6Shiv1WRFifvuZnDj';
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+/* GET home page. */
+app.get('/', function(req, res, next) {
+	if(req.query.imgUrl){
+		setupSession.start(decodeURIComponent(req.query.imgUrl), res);
+	}
+	else if(req.query.session){
+		var session;
+		try{
+			session = JSON.parse(req.query.session).session;
+		}
+		catch(err){
+			console.log('Failed to parse session');
+		}
+		swapper.faceSwap(session, function(result){ res.json(result); });
+	}
+	else{
+		res.json({ success:false });
+	}
 });
 
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.json({ success: false, error: err })
-  });
+if(process.argv.length !== 4){
+	console.log('Usage: node app.js botServerAddress thisServerAddress');
+	process.exit();
 }
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.json({ success: false, error: err })
-});
-
-
-module.exports = app;
+else{
+	var url = process.argv[2] + '/?secret=' + SECRET + '&address=' + process.argv[3];
+	http.get(url, function(res) {
+		res.on('end', function() {
+			console.log('Connected. (Probably)');
+		});
+	}).on('error', function(e) {
+		console.log('Failed to connect to bot server');
+		console.log('Got error: ' + e.message);
+		process.exit();
+	});
+}
