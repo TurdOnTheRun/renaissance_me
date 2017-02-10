@@ -35,7 +35,7 @@ if(process.argv.length !== 4){
 	process.exit();
 }
 else{
-	var url = process.argv[2] + '/?secret=' + SECRET + '&address=' + process.argv[3];
+	var url = process.argv[2] + '/loadbalancer/?secret=' + SECRET + '&address=' + process.argv[3];
 	http.get(url, function(res) {
 		res.on('end', function() {
 			console.log('Connected. (Probably)');
