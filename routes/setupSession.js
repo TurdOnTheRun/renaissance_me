@@ -90,7 +90,7 @@ var getFaces = function(imagePath, res){
 
     c.on('exit', function (code){
         if(code === 1){
-            res.json({'success': false, 'msg': 'ERROR_FACE_EXTRACTOR', 'error': 0});
+            return res.json({'success': false, 'msg': 'ERROR_FACE_EXTRACTOR', 'error': 0});
         }
     });
 };
