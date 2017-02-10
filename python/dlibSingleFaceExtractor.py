@@ -170,7 +170,7 @@ if __name__ == '__main__':
 
     faces, landmarks = read_faces_and_landmarks(imagePath)
 
-    if faces === False:
+    if faces == False:
         sys.exit(json.dumps({'success':False, 'msg':'NO_FACES', 'error': 1}))
 
     mags = []
