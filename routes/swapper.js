@@ -130,6 +130,10 @@ var swapFaces = function(session, callback){
     });
 };
 
-router.SERVER_URL = SERVER_URL;
+var setServerUrl = function(url){
+    SERVER_URL = url;
+};
+
+router.setServerUrl = setServerUrl;
 router.faceSwap = swapFaces;
 module.exports = router;

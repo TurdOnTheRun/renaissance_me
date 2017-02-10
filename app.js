@@ -32,7 +32,7 @@ app.get('/', function(req, res, next) {
 
 // YOYO
 if(process.argv.length === 3){
-    swapper.SERVER_URL = process.argv[2];
+    swapper.setServerUrl(process.argv[2]);
 }
 else{
     process.exit();
@@ -47,7 +47,7 @@ else{
 //  http.get(url, function(res) {
 //      res.on('end', function() {
 //          console.log('Connected. (Probably)');
-//          swapper.SERVER_URL = process.argv[3];
+//          swapper.setServerUrl(process.argv[3]);
 //      });
 //  }).on('error', function(e) {
 //      console.log('Failed to connect to bot server');
