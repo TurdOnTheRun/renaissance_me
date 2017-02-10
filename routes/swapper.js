@@ -96,8 +96,6 @@ var swapFaces = function(session, callback){
     }
     
     var painting = painting_magnitudes[session.magnitudes][session.collection[session.index]];
-    console.log(painting_magnitudes[session.magnitudes]);
-    console.log(session.collection[session.index]);
     var inputFolder = PATH_TO_SESSIONS + session.sessionId + '/input/';
     var facesFolder = PATH_TO_PORTRAIT_FACES + painting + '/';
     var outputFolder = PATH_TO_SESSIONS + session.sessionId + '/swapped/' + painting + '/';
