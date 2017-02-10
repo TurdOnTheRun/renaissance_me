@@ -14,7 +14,7 @@ var PATH_TO_SESSIONS = path.join(__dirname, '..', '/sessions/');
 var PATH_TO_PORTRAIT_FACES = path.join(__dirname, '..', '/faces/');
 var PATH_TO_OUTPUTS = path.join(__dirname, '..', '/public/images/');
 var SERVER_URL;
-var S3_BUCKET_URL = 'http://renaissanceme.s3-website-us-east-1.amazonaws.com/';
+var S3_BUCKET_URL = 'https://s3.amazonaws.com/renaissanceme/';
 
 var insertFaces = function(session, callback){
 
