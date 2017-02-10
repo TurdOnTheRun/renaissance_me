@@ -196,5 +196,5 @@ if __name__ == '__main__':
 	datas = [c for (m,c) in sorted(zip(mags,datas))]
 	mags.sort()
 	magnitudeString = ''.join(str(i) for i in mags)
-	print json.dumps({'success':True, 'faces': datas, 'magnitudes': magnitudeString, 'session_id':FOLDER_NAME[:-1], 'face_count': len(datas)})
+	print json.dumps({ 'success':True, 'session':{'faces': datas, 'magnitudes': magnitudeString, 'sessionId':FOLDER_NAME[:-1], 'face_count': len(datas)} })
 	sys.exit(0)
