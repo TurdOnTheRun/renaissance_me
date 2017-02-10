@@ -112,7 +112,7 @@ def calculate_faceangle(im, s):
         #   cv2.line(im, (s[NOSE_TIP].item(0), s[NOSE_TIP].item(1)), (b.item(0), b.item(1)), (0,255,0), 1)
         #   cv2.putText(im, str(a.item(0) - nose_x), ((nose_x + a.item(0))/2, ((s[NOSE_TIP].item(1) + a.item(1))/2) + 3), FONT, 0.5, (0,0,255), 1)
         #   cv2.putText(im, str(b.item(0) - nose_x), ((nose_x + b.item(0))/2, ((s[NOSE_TIP].item(1) + b.item(1))/2) + 3), FONT, 0.5, (0,0,255), 1)
-    
+
     # cv2.imshow("Faces", im)
     # cv2.waitKey(0)
 
@@ -160,9 +160,8 @@ def calculate_faceangle(im, s):
 if __name__ == '__main__':
 
     if len(sys.argv) != 2:
-        print json.dumps({'success':False, 'msg':'WRONG_INPUT', 'error': 0})
-        sys.exit(1)
-    
+        sys.exit(json.dumps({'success':False, 'msg':'WRONG_INPUT', 'error': 0}))
+
     # Set path to image folder
     imagePath = sys.argv[1]
 
@@ -171,9 +170,8 @@ if __name__ == '__main__':
 
     faces, landmarks = read_faces_and_landmarks(imagePath)
 
-    if faces == False:
-        print json.dumps({'success':False, 'msg':'NO_FACES', 'error': 1})
-        sys.exit(1)
+    if faces === False:
+        sys.exit(json.dumps({'success':False, 'msg':'NO_FACES', 'error': 1}))
 
     mags = []
     datas = []
@@ -190,8 +188,7 @@ if __name__ == '__main__':
         count = count + 1
 
     if len(mags) == 0:
-        print json.dumps({'success': False, 'msg': 'NO_FACES_W_MAG', 'error': 1})
-        sys.exit(1)
+        sys.exit(json.dumps({'success': False, 'msg': 'NO_FACES_W_MAG', 'error': 1}))
 
     datas = [c for (m,c) in sorted(zip(mags,datas))]
     mags.sort()
