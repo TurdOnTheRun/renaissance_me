@@ -38,6 +38,7 @@ from `<head image>` replaced with the facial features from `<face image>`.
 import cv2
 import dlib
 import numpy
+import urllib
 
 import sys
 
@@ -154,8 +155,22 @@ def transformation_from_points(points1, points2):
                                        c2.T - (s2 / s1) * R * c1.T)),
                          numpy.matrix([0., 0., 1.])])
 
-def read_im_and_landmarks(fname, mirr):
+def read_im_and_landmarks_local(fname, mirr):
     im = cv2.imread(fname, cv2.IMREAD_COLOR)
+    if mirr:
+        im = cv2.flip(im,1)
+    im = cv2.resize(im, (im.shape[1] * SCALE_FACTOR,
+                         im.shape[0] * SCALE_FACTOR))
+    s = get_landmarks(im)
+
+    return im, s
+
+def read_im_and_landmarks_web(imUrl, mirr):
+    try: resp = urllib.urlopen(imUrl)
+    except urllib.error.URLError:
+        sys.exit('Failed to load image from web.')
+    im = numpy.asarray(bytearray(resp.read()), dtype="uint8")
+    im = cv2.imdecode(im, cv2.IMREAD_COLOR)
     if mirr:
         im = cv2.flip(im,1)
     im = cv2.resize(im, (im.shape[1] * SCALE_FACTOR,
@@ -195,8 +210,8 @@ mirror = False
 if sys.argv[4] != sys.argv[5]:
     mirror = True
 
-im1, landmarks1 = read_im_and_landmarks(sys.argv[1], False)
-im2, landmarks2 = read_im_and_landmarks(sys.argv[2], mirror)
+im1, landmarks1 = read_im_and_landmarks_local(sys.argv[1], False)
+im2, landmarks2 = read_im_and_landmarks_web(sys.argv[2], mirror)
 
 M = transformation_from_points(landmarks1[ALIGN_POINTS],
                                landmarks2[ALIGN_POINTS])
