@@ -16,7 +16,7 @@ var client = s3.createClient({
     },
 });
 
-var painting_magnitudes = JSON.parse(fs.readFileSync('magnitudes.json', 'utf8')); 
+var painting_magnitudes = JSON.parse(fs.readFileSync('magnitudes.json', 'utf8'));
 var S3_BUCKET_NAME = 'renaissanceme';
 
 //Needs to be implemented

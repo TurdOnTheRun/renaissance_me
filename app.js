@@ -4,11 +4,11 @@ var http = require('http');
 var setupSession = require('./routes/setupSession');
 var swapper = require('./routes/swapper');
 
-var app = express();
-app.listen((process.env.PORT || 3000));
-app.use(express.static(path.join(__dirname, 'public')));
-
 var SECRET = 'VYD6Shiv1WRFifvuZnDj';
+var RM_CHATBOT = 'https://renaissance-me.herokuapp.com/';
+
+var app = express();
+app.use(express.static(path.join(__dirname, 'public')));
 
 /* GET home page. */
 app.get('/', function(req, res, next) {
@@ -30,20 +30,18 @@ app.get('/', function(req, res, next) {
     }
 });
 
-if(process.argv.length !== 4){
-    console.log('Usage: node app.js botServerAddress thisServerAddress');
-    process.exit();
-}
-else{
-    var url = process.argv[2] + '/loadbalancer/?secret=' + SECRET + '&address=' + process.argv[3];
-    http.get(url, function(res){
-        res.on('end', function(){
-            console.log('Connected. (Probably)');
-            swapper.setServerUrl(process.argv[3]);
-        });
-    }).on('error', function(e){
-        console.log('Failed to connect to bot server');
-        console.log('Got error: ' + e.message);
-        process.exit();
-    });
-}
+var server = app.listen((process.env.PORT || 3000), function(){
+    var hostAddress = server.address().address + ':' + server.address().port;
+    console.log(hostAddress);
+    var url = RMCHATBOT + 'loadbalancer/?secret=' + SECRET + '&address=' + hostAddress;
+    swapper.setServerUrl(hostAddress);
+    // http.get(url, function(res){
+    //     res.on('end', function(){
+    //         console.log('Connected. (Probably)');
+    //     });
+    // }).on('error', function(e){
+    //     console.log('Failed to connect to bot server');
+    //     console.log('Got error: ' + e.message);
+    //     process.exit();
+    // });
+});

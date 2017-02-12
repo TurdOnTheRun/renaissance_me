@@ -13,7 +13,7 @@ var painting_magnitudes = JSON.parse(fs.readFileSync('magnitudes.json', 'utf8'))
 var PATH_TO_SESSIONS = path.join(__dirname, '..', '/sessions/');
 var PATH_TO_PORTRAIT_FACES = path.join(__dirname, '..', '/faces/');
 var PATH_TO_OUTPUTS = path.join(__dirname, '..', '/public/images/');
-var SERVER_URL;
+var HOST_ADDRESS;
 var S3_BUCKET_URL = 'https://s3.amazonaws.com/renaissanceme/';
 
 var insertFaces = function(session, callback){
@@ -55,7 +55,7 @@ var insertFaces = function(session, callback){
 
     callFaceInsert(painting, outputPath, heads.join(' '), function(code){
         if(code){
-            session.collection[session.index] = { painting: painting, imgUrl: SERVER_URL + '/' + outputPath.substring(outputPath.indexOf('images')) };
+            session.collection[session.index] = { painting: painting, imgUrl: HOST_ADDRESS + '/' + outputPath.substring(outputPath.indexOf('images')) };
             return callback({ success: true, session: session });
         }
         else{
@@ -131,7 +131,7 @@ var swapFaces = function(session, callback){
 };
 
 var setServerUrl = function(url){
-    SERVER_URL = url;
+    HOST_ADDRESS = url;
 };
 
 router.setServerUrl = setServerUrl;
