@@ -30,28 +30,20 @@ app.get('/', function(req, res, next) {
     }
 });
 
-// YOYO
-if(process.argv.length === 3){
-    swapper.setServerUrl(process.argv[2]);
-}
-else{
+if(process.argv.length !== 4){
+    console.log('Usage: node app.js botServerAddress thisServerAddress');
     process.exit();
 }
-
-// if(process.argv.length !== 4){
-//  console.log('Usage: node app.js botServerAddress thisServerAddress');
-//  process.exit();
-// }
-// else{
-//  var url = process.argv[2] + '/loadbalancer/?secret=' + SECRET + '&address=' + process.argv[3];
-//  http.get(url, function(res) {
-//      res.on('end', function() {
-//          console.log('Connected. (Probably)');
-//          swapper.setServerUrl(process.argv[3]);
-//      });
-//  }).on('error', function(e) {
-//      console.log('Failed to connect to bot server');
-//      console.log('Got error: ' + e.message);
-//      process.exit();
-//  });
-// }
+else{
+    var url = process.argv[2] + '/loadbalancer/?secret=' + SECRET + '&address=' + process.argv[3];
+    http.get(url, function(res){
+        res.on('end', function(){
+            console.log('Connected. (Probably)');
+            swapper.setServerUrl(process.argv[3]);
+        });
+    }).on('error', function(e){
+        console.log('Failed to connect to bot server');
+        console.log('Got error: ' + e.message);
+        process.exit();
+    });
+}
