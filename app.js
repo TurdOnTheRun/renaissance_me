@@ -42,13 +42,13 @@ getIP(function (err, ip) {
     console.log('Host-address: ' + hostAddress);
     swapper.setServerUrl(hostAddress);
     var url = RM_CHATBOT + 'loadbalancer/?secret=' + SECRET + '&address=' + hostAddress;
-    // http.get(url, function(res){
-    //     res.on('end', function(){
-    //         console.log('Connected. (Probably)');
-    //     });
-    // }).on('error', function(e){
-    //     console.log('Failed to connect to bot server');
-    //     console.log('Got error: ' + e.message);
-    //     process.exit();
-    // });
+    http.get(url, function(res){
+        res.on('end', function(){
+            console.log('Connected. (Probably)');
+        });
+    }).on('error', function(e){
+        console.log('Failed to connect to bot server');
+        console.log('Got error: ' + e.message);
+        process.exit();
+    });
 });
