@@ -21,7 +21,7 @@ app.get('/', function(req, res, next) {
     else if(req.query.session){
         var session;
         try{
-            session = JSON.parse(req.query.session).session;
+            session = JSON.parse(req.query.session);
         }
         catch(err){
             console.log('Failed to parse session');
@@ -38,13 +38,10 @@ getIP(function (err, ip) {
         console.log('Failed to get IP');
         throw err;
     }
-    console.log(ip);
-    var hostAddress = ip + ':' + PORT + '/';
-    var url = RM_CHATBOT + 'loadbalancer/?secret=' + SECRET + '&address=' + hostAddress;
-    console.log(hostAddress);
-    console.log(url);
+    var hostAddress = 'http://' + ip + ':' + PORT + '/';
+    console.log('Host-address: ' + hostAddress);
     swapper.setServerUrl(hostAddress);
-
+    var url = RM_CHATBOT + 'loadbalancer/?secret=' + SECRET + '&address=' + hostAddress;
     // http.get(url, function(res){
     //     res.on('end', function(){
     //         console.log('Connected. (Probably)');
