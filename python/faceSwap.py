@@ -43,7 +43,7 @@ import urllib
 import sys
 
 PREDICTOR_PATH = "shape_predictor_68_face_landmarks.dat"
-SCALE_FACTOR = 1 
+SCALE_FACTOR = 1
 FEATHER_AMOUNT = 11
 
 FACE_POINTS = list(range(17, 68))

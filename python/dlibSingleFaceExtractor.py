@@ -160,7 +160,7 @@ def calculate_faceangle(im, s):
 if __name__ == '__main__':
 
     if len(sys.argv) != 2:
-        sys.exit(json.dumps({'success':False, 'msg':'WRONG_INPUT', 'error': 0}))
+        sys.exit(json.dumps({'success': False, 'msg': 'WRONG_INPUT', 'error': 0}))
 
     # Set path to image folder
     imagePath = sys.argv[1]
@@ -170,8 +170,8 @@ if __name__ == '__main__':
 
     faces, landmarks = read_faces_and_landmarks(imagePath)
 
-    if faces == False:
-        sys.exit(json.dumps({'success':False, 'msg':'NO_FACES', 'error': 1}))
+    if faces is False:
+        sys.exit(json.dumps({'success': False, 'msg': 'NO_FACES', 'error': 1}))
 
     mags = []
     datas = []
@@ -188,10 +188,10 @@ if __name__ == '__main__':
         count = count + 1
 
     if len(mags) == 0:
-        sys.exit(json.dumps({'success': False, 'msg': 'NO_FACES_W_MAG', 'error': 1}))
+        sys.exit(json.dumps({'success': False, 'msg': 'NO_FACES', 'error': 1}))
 
-    datas = [c for (m,c) in sorted(zip(mags,datas))]
+    datas = [c for (m, c) in sorted(zip(mags, datas))]
     mags.sort()
     magnitudeString = ''.join(str(i) for i in mags)
-    print json.dumps({ 'success':True, 'session':{'faces': datas, 'magnitudes': magnitudeString, 'sessionId':FOLDER_NAME[:-1], 'face_count': len(datas)} })
+    print json.dumps({ 'success': True, 'session': {'faces': datas, 'magnitudes': magnitudeString, 'sessionId': FOLDER_NAME[:-1], 'face_count': len(datas)} })
     sys.exit(0)
