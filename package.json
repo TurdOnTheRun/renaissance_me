@@ -9,6 +9,7 @@
     "express": "~4.13.1",
     "shuffle": "~0.2.2",
     "s3": "~4.4.0",
-    "external-ip": "~0.2.4"
+    "external-ip": "~0.2.4",
+    "mkdirp": "~0.5.1"
   }
 }

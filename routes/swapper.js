@@ -2,6 +2,7 @@ var express = require('express');
 var fs = require( 'fs' );
 var child = require('child_process');
 var path = require('path');
+var mkdirp = require('mkdirp');
 
 var router = express.Router();
 var faceSwap = 'python ' + path.join(__dirname, '../python', 'faceSwap.py ');
@@ -101,7 +102,7 @@ var swapFaces = function(session, callback){
     var counter = 0;
     var failure = false;
 
-    fs.mkdir(outputFolder, function(err){
+    mkdirp(outputFolder, function(err){
         if(err){
             console.log('mkdir err: ' + err);
             return callback({ success: false, session: session });
