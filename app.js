@@ -13,13 +13,10 @@ var RM_CHATBOT = 'http://renaissance-me.herokuapp.com/';
 var app = express();
 app.listen(PORT);
 app.use(function (req, res, next) {
+    console.log(req.url);
     var directory = path.dirname(req.url);
     console.log(directory);
     var directories = directory.split('/');
-    if(directories[1].substring(0, 1) === '?'){
-        console.log('Deleter rejected');
-        return;
-    }
     console.log(directories);
     var sessionId = directories[directories.length - 1];
     console.log(sessionId);
