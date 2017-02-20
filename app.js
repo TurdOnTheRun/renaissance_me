@@ -13,16 +13,14 @@ var RM_CHATBOT = 'http://renaissance-me.herokuapp.com/';
 var app = express();
 app.listen(PORT);
 app.use(function (req, res, next) {
-    console.log(req.url);
     var directory = path.dirname(req.url);
-    console.log(directory);
     var directories = directory.split('/');
-    console.log(directories);
-    var sessionId = directories[directories.length - 1];
-    console.log(sessionId);
-    setTimeout(function(){
-        deleter(sessionId);
-    }, 10000);
+    if(directories.length === 3){
+        var sessionId = directories[directories.length - 1];
+        setTimeout(function(){
+            deleter(sessionId, req.url);
+        }, 10000);
+    }
     next();
 });
 app.use(express.static(path.join(__dirname, 'public')));
