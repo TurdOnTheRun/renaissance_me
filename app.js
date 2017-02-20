@@ -8,7 +8,7 @@ var deleter = require('./routes/deleter');
 
 var PORT = 3000;
 var SECRET = 'VYD6Shiv1WRFifvuZnDj';
-var RM_CHATBOT = 'https://renaissance-me.herokuapp.com/';
+var RM_CHATBOT = 'http://renaissance-me.herokuapp.com/';
 
 var app = express();
 app.listen(PORT);
