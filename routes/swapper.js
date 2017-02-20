@@ -46,7 +46,8 @@ var insertFaces = function(session, callback){
     };
 
     var painting = painting_magnitudes[session.magnitudes][session.collection[session.index]];
-    var outputPath = PATH_TO_OUTPUTS + session.sessionId + '/' + painting + '.png';
+    var outputFolderPath = PATH_TO_OUTPUTS + session.sessionId;
+    var outputFilePath = PATH_TO_OUTPUTS + session.sessionId + '/' + painting + '.png';
     var swappedHeadsFolder = PATH_TO_SESSIONS + session.sessionId + '/swapped/' + painting + '/';
     var heads = [];
 
@@ -54,15 +55,19 @@ var insertFaces = function(session, callback){
         heads.push(swappedHeadsFolder + i + '.png');
     }
 
-    callFaceInsert(painting, outputPath, heads.join(' '), function(code){
-        if(code){
-            session.collection[session.index] = { painting: painting, imgUrl: HOST_ADDRESS + '/' + outputPath.substring(outputPath.indexOf('images')) };
-            return callback({ success: true, session: session });
-        }
-        else{
-            session.index++;
-            return swapFaces(session, callback);
-        }
+    mkdirp(outputFolder, function(){
+
+        callFaceInsert(painting, outputFilePath, heads.join(' '), function(code){
+            if(code){
+                session.collection[session.index] = { painting: painting, imgUrl: HOST_ADDRESS + '/' + outputFilePath.substring(outputFilePath.indexOf('images')) };
+                return callback({ success: true, session: session });
+            }
+            else{
+                session.index++;
+                return swapFaces(session, callback);
+            }
+        });
+
     });
 };
 
