@@ -4,6 +4,7 @@ var http = require('http');
 var getIP = require('external-ip')();
 var setupSession = require('./routes/setupSession');
 var swapper = require('./routes/swapper');
+var deleter = require('./routes/deleter');
 
 var PORT = 3000;
 var SECRET = 'VYD6Shiv1WRFifvuZnDj';
@@ -11,6 +12,22 @@ var RM_CHATBOT = 'https://renaissance-me.herokuapp.com/';
 
 var app = express();
 app.listen(PORT);
+app.use(function (req, res, next) {
+    var directory = path.dirname(req.url);
+    console.log(directory);
+    var directories = directory.split('/');
+    if(directories[1].substring(0, 1) === '?'){
+        console.log('Deleter rejected');
+        return;
+    }
+    console.log(directories);
+    var sessionId = directories[directories.length - 1];
+    console.log(sessionId);
+    setTimeout(function(){
+        deleter(sessionId);
+    }, 10000);
+    next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 /* GET home page. */

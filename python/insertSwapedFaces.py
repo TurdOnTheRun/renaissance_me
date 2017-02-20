@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     PRE_PATH = '.'
 
-    with open(PRE_PATH + '/faceDatabase.json') as input_data:    
+    with open(PRE_PATH + '/faceDatabase.json') as input_data:
         data = json.load(input_data)
 
     paintingId = sys.argv[1]

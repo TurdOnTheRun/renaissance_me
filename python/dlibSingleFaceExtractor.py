@@ -63,7 +63,7 @@ def get_faces(im):
             rec_left = face.width()/FACE_SCALE_FACTOR + left
             rec_right = face.width() + face.width()/FACE_SCALE_FACTOR - 1 + left
             left = 0
-        
+
         face_im = im[top: bottom, left: right]
         face_dest = PATH_TO_INPUT_IMAGES + FOLDER_NAME + 'input/' + str(i) + '.png'
         cv2.imwrite(face_dest, face_im)

@@ -1,0 +1,8 @@
+#!/bin/bash
+if [[ -n "$1" && -n "$2" ]]
+then
+ rm -rf "$1"
+ rm -rf "$2"
+else
+ echo "Usage: delete-files sessionsFolder inputFolder"
+fi
