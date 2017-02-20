@@ -82,8 +82,8 @@ class NoFaces(Exception):
 def get_landmarks(im):
     rects = detector(im, 1)
     
-    if len(rects) > 1:
-        raise TooManyFaces
+    # if len(rects) > 1:
+    #     raise TooManyFaces
     if len(rects) == 0:
         raise NoFaces
 

@@ -55,7 +55,7 @@ var insertFaces = function(session, callback){
         heads.push(swappedHeadsFolder + i + '.png');
     }
 
-    mkdirp(outputFolder, function(){
+    mkdirp(outputFolderPath, function(){
 
         callFaceInsert(painting, outputFilePath, heads.join(' '), function(code){
             if(code){
